@@ -2,8 +2,6 @@ package org.domain.restfulapiarticle.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
 import java.io.Serializable;
-import java.util.Date;
-//import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -18,7 +18,6 @@ import javax.persistence.Version;
 
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime; 
-import org.joda.time.contrib.hibernate.PersistentDateTime;
 
 @Entity 
 @Table(name="article") 
@@ -31,8 +30,8 @@ public class Article implements Serializable {
 	private String titleArticle;
 	private String bodyArticle;
 	private String author;
-	private Date dateCreate;
-	private Date dateUpdate;
+	private DateTime dateCreate;
+	private DateTime dateUpdate;
 	
 	private int version;
 	
@@ -59,14 +58,14 @@ public class Article implements Serializable {
 	}
 	
 	@Column(name="date_create") 
-	@Temporal(TemporalType.DATE) 
-	public Date getDateCreate() {
+	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	public DateTime getDateCreate() {
 		return dateCreate;
 	}
 	
 	@Column(name="date_update") 
-	@Temporal(TemporalType.DATE) 
-	public Date getDateUpdate() {
+	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	public DateTime getDateUpdate() {
 		return dateUpdate;
 	}
 	
@@ -92,11 +91,11 @@ public class Article implements Serializable {
 		this.author = author;
 	}
 
-	public void setDateCreate(Date dateCreate) {
+	public void setDateCreate(DateTime dateCreate) {
 		this.dateCreate = dateCreate;
 	}
 
-	public void setDateUpdate(Date dateUpdate) {
+	public void setDateUpdate(DateTime dateUpdate) {
 		this.dateUpdate = dateUpdate;
 	}
 
@@ -104,6 +103,18 @@ public class Article implements Serializable {
 		this.version = version;
 	}
 
+	@PrePersist
+    public void prePersist() {
+        DateTime now = DateTime.now();
+        this.dateCreate = now;
+        this.dateUpdate = now;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+    	this.dateUpdate = DateTime.now();
+    }
+	
 	@Override
 	public String toString() {
 		return "Article [id=" + id + ", titleArticle=" + titleArticle

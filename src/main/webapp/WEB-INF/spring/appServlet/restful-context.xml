@@ -39,5 +39,5 @@
 	</beans:bean>
 	-->
 	
-	<context:component-scan base-package="org.domain.restfulapiarticle.controller" />
+	<context:component-scan base-package="org.domain.restfulapiarticle.test.controller" />
 </beans:beans>

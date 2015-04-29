@@ -1,10 +1,14 @@
 package org.domain.restfulapiarticle.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.domain.restfulapiarticle.entity.Article;
-import org.domain.restfulapiarticle.entity.Articles;
+import org.domain.restfulapiarticle.entity.ArticleJSON;
+import org.domain.restfulapiarticle.exception.ArticleNotFoundException;
+
 import org.domain.restfulapiarticle.service.ArticleService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,24 +37,25 @@ public class ArticleController {
 	}
 
 	@RequestMapping(method=RequestMethod.GET)
-	public @ResponseBody Articles articleList(Model uiModel) {
+	public @ResponseBody List<ArticleJSON> articleList(Model uiModel) {
 		logger.info("Listing Article");
-		return new Articles(articleService.findAll());
+		return createArticlesJSON(articleService.findAll());
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
-	public @ResponseBody Article article(@PathVariable Long id) {
+	public @ResponseBody ArticleJSON article(@PathVariable Long id) throws ArticleNotFoundException{
 		logger.info("Article");
 		Article article = articleService.findById(id);
-		return article;
+		ArticleJSON articleJSON = new ArticleJSON(article);
+		return articleJSON;
 	}
 	
 	@RequestMapping(value="/", method=RequestMethod.POST) 
 	@ResponseBody 
 	public Article create(@RequestBody Article article) { 
-		articleService.save(article); 
+		Article newArticle = articleService.save(article); 
 		logger.info("Article created successfully with info: " + article); 
-		return article;
+		return newArticle;
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.PUT) 
@@ -66,9 +71,17 @@ public class ArticleController {
 		articleService.delete(id); 
 		logger.info("Contact deleted successfully");
 		
-	} 
-
-
-
+	}
 	
+	private List<ArticleJSON> createArticlesJSON(List<Article> articles) {
+		List<ArticleJSON> articlesJSON = new ArrayList<ArticleJSON>();
+		
+		for (Article article : articles) {
+			articlesJSON.add(new ArticleJSON(article));
+		}
+		return articlesJSON;
+	}
+	
+	
+		
 }
